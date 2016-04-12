@@ -5,23 +5,26 @@
 
 class Meta
 {
-    QString itag;
+    int itag;
     QString url;
     QString extension;
     QString resolution;
+    QString size;
 public:
     Meta();
 
-    void setItag(QString& itag);
-    void setUrl(QString& url);
-    void setExtension(QString& extension);
-    void setResolution(QString& resolution);
+    void findVideoSize();
 
-    QString getItag();
-    QString getUrl();
-    QString getExtension();
-    QString getResolution();
-
+    int getItag() const;
+    void setItag(const int &value);
+    QString getUrl() const;
+    void setUrl(const QString &value);
+    QString getExtension() const;
+    void setExtension(const QString &value);
+    QString getResolution() const;
+    void setResolution(const QString &value);
+    QString getSize() const;
+    void setSize(const QString &value);
 };
 
 #endif // META_H

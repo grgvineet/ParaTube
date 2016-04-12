@@ -10,17 +10,23 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = parallel-tube
 TEMPLATE = app
+CONFIG += c++11
 
 
 SOURCES += main.cpp\
         mainwindow.cpp \
     video.cpp \
     meta.cpp \
-    youtube.cpp
+    youtube.cpp \
+    networkmanager.cpp \
+    videoinfo.cpp
 
 HEADERS  += mainwindow.h \
     video.h \
     meta.h \
-    youtube.h
+    youtube.h \
+    networkmanager.h \
+    videoinfo.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    videoinfo.ui

@@ -4,6 +4,7 @@
 #include <QString>
 #include <QList>
 #include <QJsonObject>
+#include <QMap>
 
 #include "meta.h"
 
@@ -16,13 +17,27 @@ class Video
     QString url;
     QString length;
 
-    QList<Meta> availaibleFormats;
+    QMap<int, Meta> availaibleFormats;
 public:
     Video();
     Video(QJsonObject& videoData);
 
     void printInfo();
 
+    QMap<int, Meta> getAvailaibleFormats() const;
+    void setAvailaibleFormats(const QMap<int, Meta> &value);
+    QString getVideoId() const;
+    void setVideoId(const QString &value);
+    QString getTitle() const;
+    void setTitle(const QString &value);
+    QString getAuthor() const;
+    void setAuthor(const QString &value);
+    QString getThumbnail() const;
+    void setThumbnail(const QString &value);
+    QString getUrl() const;
+    void setUrl(const QString &value);
+    QString getLength() const;
+    void setLength(const QString &value);
 };
 
 #endif // VIDEO_H
