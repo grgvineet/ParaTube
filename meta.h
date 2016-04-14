@@ -9,7 +9,8 @@ class Meta
     QString url;
     QString extension;
     QString resolution;
-    QString size;
+    QString humanReadableSize;
+    int size;
 public:
     Meta();
 
@@ -23,8 +24,10 @@ public:
     void setExtension(const QString &value);
     QString getResolution() const;
     void setResolution(const QString &value);
-    QString getSize() const;
-    void setSize(const QString &value);
+    int getSize() const;
+    void setSize(const int &value);
+    QString getHumanReadableSize() const;
+    void setHumanReadableSize(const QString &value);
 };
 
 #endif // META_H

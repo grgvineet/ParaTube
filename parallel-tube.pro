@@ -19,14 +19,27 @@ SOURCES += main.cpp\
     meta.cpp \
     youtube.cpp \
     networkmanager.cpp \
-    videoinfo.cpp
+    videoinfo.cpp \
+    downloaderthread.cpp \
+    videourldialog.cpp \
+    playlisturldialog.cpp \
+    downloadmanager.cpp
 
 HEADERS  += mainwindow.h \
     video.h \
     meta.h \
     youtube.h \
     networkmanager.h \
-    videoinfo.h
+    videoinfo.h \
+    downloaderthread.h \
+    videourldialog.h \
+    playlisturldialog.h \
+    downloadmanager.h
 
 FORMS    += mainwindow.ui \
-    videoinfo.ui
+    videoinfo.ui \
+    videourldialog.ui \
+    playlisturldialog.ui
+
+RESOURCES += \
+    resource.qrc

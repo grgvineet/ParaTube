@@ -1,21 +1,21 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include "playlisturldialog.h"
 #include "video.h"
 #include "videoinfo.h"
+#include "videourldialog.h"
 #include "youtube.h"
 
 #include <QtCore>
 #include <QString>
+#include <QFile>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
-    connect(ui->bParseUrl, SIGNAL(clicked(bool)), this, SLOT(onParseUrlClicked(bool)));
-
 }
 
 MainWindow::~MainWindow()
@@ -23,16 +23,16 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::onParseUrlClicked(bool checked)
+void MainWindow::on_addVideo_triggered()
 {
-    Youtube youtube;
-    QString string(ui->leUrl->text());
-    connect(&youtube, SIGNAL(videoDataDownloaded(Video)), this, SLOT(videoDataDownloaded(Video)) );
-    youtube.downloadVideo(string);
+    VideoUrlDialog dialog;
+    dialog.setModal(true);
+    dialog.exec();
 }
 
-void MainWindow::videoDataDownloaded(Video video)
+void MainWindow::on_addPlaylist_triggered()
 {
-    QDialog* dialog = new VideoInfo(video, this);
-    dialog->show();
+    PlaylistUrlDialog dialog;
+    dialog.setModal(true);
+    dialog.exec();
 }

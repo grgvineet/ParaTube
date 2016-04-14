@@ -158,7 +158,7 @@ void Video::printInfo()
     qDebug() << "Length : " << this->length;
     qDebug() << "Video Id : " << this->videoId;
     Q_FOREACH(Meta meta, this->availaibleFormats) {
-        qDebug() << meta.getItag() << " " << meta.getSize();
+        qDebug() << meta.getItag() << " " << meta.getHumanReadableSize();
     }
 }
 

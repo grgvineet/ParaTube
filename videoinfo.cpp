@@ -1,5 +1,8 @@
 #include "videoinfo.h"
 #include "ui_videoinfo.h"
+#include "downloaderthread.h"
+#include "downloadmanager.h"
+#include "networkmanager.h"
 
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -28,12 +31,14 @@ VideoInfo::VideoInfo(Video video,QWidget *parent) :
         table->setItem(i, 0, new QTableWidgetItem(QString::number(meta.getItag())));
         table->setItem(i, 1, new QTableWidgetItem(meta.getExtension()));
         table->setItem(i, 2, new QTableWidgetItem(meta.getResolution()));
-        table->setItem(i, 3, new QTableWidgetItem(meta.getSize()));
+        table->setItem(i, 3, new QTableWidgetItem(meta.getHumanReadableSize()));
         i++;
     }
     table->selectRow(0);
 
     connect(ui->bDownload, SIGNAL(clicked(bool)), this, SLOT(onDownloadClicked(bool)));
+
+    progress = 0;
 
 }
 
@@ -57,13 +62,8 @@ void VideoInfo::onDownloadClicked(bool checked)
     Meta meta = video.getAvailaibleFormats()[itagText.toInt()];
 
     while (true) {
-        QEventLoop eventLoop;
-        QNetworkRequest req(meta.getUrl());
-        QObject::connect(mgr, SIGNAL(finished(QNetworkReply*)), &eventLoop, SLOT(quit()));
-        QNetworkReply *reply = mgr->head(req);
-        eventLoop.exec();
-
-        QObject::disconnect(mgr, SIGNAL(finished(QNetworkReply*)), &eventLoop, SLOT(quit()));
+        QString url = meta.getUrl();
+        QNetworkReply* reply = NetworkManager::getInstance().head(url);
 
         if (reply->error() != QNetworkReply::NoError) {
             qDebug() << reply->errorString();
@@ -83,29 +83,17 @@ void VideoInfo::onDownloadClicked(bool checked)
         break;
     }
 
-    QNetworkReply* reply = mgr->get(QNetworkRequest(meta.getUrl()));
-    connect(reply, SIGNAL(readyRead()), this, SLOT(dataReceived()) );
-    connect(reply, SIGNAL(finished()), this, SLOT(finished()));
-    connect(reply, SIGNAL(downloadProgress(qint64,qint64)), this, SLOT(downloadProgress(qint64, qint64)) );
+    DownloadManager *dm = new DownloadManager(meta, video.getTitle() + "." + tableWidget->item(selectedRow, 1)->text(), this);
+    connect(dm, SIGNAL(progress(qint64,qint64)), this, SLOT(downloadProgress(qint64,qint64)) );
+    connect(dm, SIGNAL(downloadCompleted()), this, SLOT(finished()) );
+    dm->download();
 
-    file = new QFile(video.getTitle() + "." + tableWidget->item(selectedRow, 1)->text(), this);
-    file->open(QIODevice::WriteOnly);
-    qDebug() << file->fileName();
-
-}
-
-void VideoInfo::dataReceived()
-{
-    QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
-    file->write(reply->readAll());
 }
 
 void VideoInfo::finished()
 {
-    QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
-    delete reply;
-    file->close();
-    delete file;
+    DownloadManager* dm = qobject_cast<DownloadManager*>(sender());
+    delete dm;
 }
 
 void VideoInfo::downloadProgress(qint64 bytesReceived, qint64 totalBytes)

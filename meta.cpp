@@ -46,14 +46,24 @@ void Meta::setResolution(const QString &value)
     resolution = value;
 }
 
-QString Meta::getSize() const
+int Meta::getSize() const
 {
     return size;
 }
 
-void Meta::setSize(const QString &value)
+void Meta::setSize(const int &value)
 {
     size = value;
+}
+
+QString Meta::getHumanReadableSize() const
+{
+    return humanReadableSize;
+}
+
+void Meta::setHumanReadableSize(const QString &value)
+{
+    humanReadableSize = value;
 }
 
 Meta::Meta()
@@ -63,22 +73,15 @@ Meta::Meta()
 
 void Meta::findVideoSize()
 {
-    QEventLoop eventLoop;
-    QNetworkAccessManager mgr;
-    // "quit()" the event-loop, when the network request "finished()"
-    QObject::connect(&mgr, SIGNAL(finished(QNetworkReply*)), &eventLoop, SLOT(quit()));
 
-    // the HTTP request
-    QNetworkRequest req(url);
-    QNetworkReply *reply = mgr.head(req);
-    eventLoop.exec(); // blocks stack until "finished()" has been called
+    QNetworkReply* reply = NetworkManager::getInstance().head(url);
 
     if (reply->error() == QNetworkReply::NoError) {
         int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 
         switch (statusCode) {
             case 200:
-                this->size = reply->header(QNetworkRequest::ContentLengthHeader).toString();
+                this->size = reply->header(QNetworkRequest::ContentLengthHeader).toInt();
                 break;
             case 301:
             case 302:
@@ -97,7 +100,7 @@ void Meta::findVideoSize()
     delete reply;
 
     // Convert to human readable
-    double x = this->getSize().toDouble();
+    double x = this->getSize();
     QString unit = "bytes";
     if (x/1024 >= 1) {
         x = x/1024;
@@ -111,7 +114,7 @@ void Meta::findVideoSize()
         x = x/1024;
         unit = "GB";
     }
-    this->setSize(QString("%1").arg(x, 0, 'f', 2) + " " + unit);
+    this->setHumanReadableSize(QString("%1").arg(x, 0, 'f', 2) + " " + unit);
 }
 
 

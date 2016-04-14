@@ -17,15 +17,7 @@ Youtube::Youtube()
 
 void Youtube::downloadVideo(QString &url)
 {
-    QEventLoop eventLoop;
-    QNetworkAccessManager mgr;
-    // "quit()" the event-loop, when the network request "finished()"
-    QObject::connect(&mgr, SIGNAL(finished(QNetworkReply*)), &eventLoop, SLOT(quit()));
-
-    // the HTTP request
-    QNetworkRequest req(url);
-    QNetworkReply *reply = mgr.get(req);
-    eventLoop.exec(); // blocks stack until "finished()" has been called
+    QNetworkReply* reply = NetworkManager::getInstance().getWebPage(url);
 
     if (reply->error() != QNetworkReply::NoError) {
         qDebug() << reply->errorString();

@@ -20,9 +20,9 @@ public:
 private:
     Ui::MainWindow *ui;
 
-public slots:
-    void onParseUrlClicked(bool checked);
-    void videoDataDownloaded(Video video);
+private slots:
+    void on_addVideo_triggered();
+    void on_addPlaylist_triggered();
 };
 
 #endif // MAINWINDOW_H

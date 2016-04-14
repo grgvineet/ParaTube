@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/icon">
+        <file>icons/addplaylist.png</file>
+        <file>icons/addvideo.png</file>
+    </qresource>
+</RCC>
