@@ -98,7 +98,7 @@ Video::Video(QJsonObject &videoData)
         Q_FOREACH(QString parameter, parameters) {
             QStringList keyValue = parameter.split("=");
             map.insert(keyValue.at(0), QUrl::fromPercentEncoding(keyValue.at(1).toUtf8()));
-            qDebug() << keyValue.at(0) << " - " << QUrl::fromPercentEncoding(keyValue.at(1).toUtf8());
+//            qDebug() << keyValue.at(0) << " - " << QUrl::fromPercentEncoding(keyValue.at(1).toUtf8());
         }
         Meta meta;
         meta.setItag(map["itag"].toInt());
@@ -138,7 +138,7 @@ Video::Video(QJsonObject &videoData)
         meta.setResolution(resolution);
         meta.findVideoSize();
         this->availaibleFormats[meta.getItag()] = meta;
-        qDebug() << "\n\n";
+//        qDebug() << "\n\n";
     }
 
     // TODO : Handle adaptive formats

@@ -13,8 +13,8 @@ public:
     NetworkManager(NetworkManager const&) = delete;
     void operator=(NetworkManager const&) = delete;
 
-    QNetworkReply* getWebPage(QString& url);
-    QNetworkReply* head(QString& url);
+    QNetworkReply* getWebPage(QUrl& url);
+    QNetworkReply* head(QUrl& url);
 
 private:
     QNetworkAccessManager* qNetworkAccessManager;

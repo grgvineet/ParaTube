@@ -1,6 +1,8 @@
 #ifndef PLAYLISTURLDIALOG_H
 #define PLAYLISTURLDIALOG_H
 
+#include "video.h"
+
 #include <QDialog>
 
 namespace Ui {
@@ -17,6 +19,10 @@ public:
 
 private:
     Ui::PlaylistUrlDialog *ui;
+
+public slots:
+    void accept();
+    void playlistDataDownloaded(QVector<Video> videos);
 };
 
 #endif // PLAYLISTURLDIALOG_H

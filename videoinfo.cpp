@@ -62,7 +62,7 @@ void VideoInfo::onDownloadClicked(bool checked)
     Meta meta = video.getAvailaibleFormats()[itagText.toInt()];
 
     while (true) {
-        QString url = meta.getUrl();
+        QUrl url(meta.getUrl());
         QNetworkReply* reply = NetworkManager::getInstance().head(url);
 
         if (reply->error() != QNetworkReply::NoError) {
@@ -92,6 +92,8 @@ void VideoInfo::onDownloadClicked(bool checked)
 
 void VideoInfo::finished()
 {
+    this->close();
+
     DownloadManager* dm = qobject_cast<DownloadManager*>(sender());
     delete dm;
 }

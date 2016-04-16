@@ -73,8 +73,8 @@ Meta::Meta()
 
 void Meta::findVideoSize()
 {
-
-    QNetworkReply* reply = NetworkManager::getInstance().head(url);
+    QUrl qurl(url);
+    QNetworkReply* reply = NetworkManager::getInstance().head(qurl);
 
     if (reply->error() == QNetworkReply::NoError) {
         int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();

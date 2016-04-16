@@ -5,6 +5,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QVector>
 
 class Youtube : public QObject
 {
@@ -13,11 +14,12 @@ public:
     Youtube();
     virtual ~Youtube() {}
 
-    void downloadVideo(QString& url);
-    void downloadPlaylist(QString& url);
+    void downloadVideo(QUrl& url);
+    void downloadPlaylist(QUrl& url);
 
 signals:
     void videoDataDownloaded(Video video);
+    void playlistDataDownloaded(QVector<Video> videos);
     void errorDownloadingVideoPage(QString& error);
     void videoDataNotFound();
 

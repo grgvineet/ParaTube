@@ -31,7 +31,6 @@ void DownloaderThread::run()
     QNetworkReply* reply = mgr->get(request);
 
     qDebug() << reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-
     connect(reply, SIGNAL(readyRead()), this, SLOT(dataReceived()) );
     connect(reply, SIGNAL(finished()), this, SLOT(finished()));
     connect(reply, SIGNAL(downloadProgress(qint64,qint64)), this, SLOT(downloadProgress(qint64, qint64)) );

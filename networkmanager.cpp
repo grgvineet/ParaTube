@@ -11,7 +11,7 @@ NetworkManager &NetworkManager::getInstance()
     return instance;
 }
 
-QNetworkReply *NetworkManager::getWebPage(QString &url)
+QNetworkReply *NetworkManager::getWebPage(QUrl &url)
 {
     // Since webpages are small, using QEventLoop
     QEventLoop eventLoop;
@@ -28,7 +28,7 @@ QNetworkReply *NetworkManager::getWebPage(QString &url)
     return reply;
 }
 
-QNetworkReply *NetworkManager::head(QString &url)
+QNetworkReply *NetworkManager::head(QUrl &url)
 {
     QEventLoop eventLoop;
 
