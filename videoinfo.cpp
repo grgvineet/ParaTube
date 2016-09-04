@@ -4,8 +4,16 @@
 #include "downloadmanager.h"
 #include "networkmanager.h"
 
+#include <QDir>
+#include <QFileDialog>
+#include <QFileInfo>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QStandardPaths>
+#include <QSettings>
+#include <QMessageBox>
+
+#include <algorithm>
 
 VideoInfo::VideoInfo(Video video,QWidget *parent) :
     QDialog(parent),
@@ -22,12 +30,38 @@ VideoInfo::VideoInfo(Video video,QWidget *parent) :
     ui->progressBar->hide();
 
     QTableWidget *table = ui->tableWidget;
-    QMap<int, Meta> map = video.getAvailaibleFormats();
-    table->setRowCount(map.size());
+    QList<Meta> availaibleFormats = video.getAvailaibleFormats();
+    table->setRowCount(availaibleFormats.size());
     table->setColumnCount(4);
     table->setHorizontalHeaderLabels(QString("ITAG;EXTENSION;RESOLUTION;SIZE").split(";"));
+
+    Q_FOREACH (Meta meta, availaibleFormats) {
+        qDebug() << meta.getSize();
+    }
+    qDebug() << "*********************************";
+    std::sort(availaibleFormats.begin(),availaibleFormats.end(), [](const Meta &a, const Meta &b) {
+        qDebug() << a.getSize() << " " << b.getSize();
+        int resA = a.getResolution().split('X')[0].toInt() * a.getResolution().split('X')[1].toInt();
+        int resB = b.getResolution().split('X')[0].toInt() * b.getResolution().split('X')[1].toInt();
+        if (resA > resB) {
+            return true;
+        } else if (resA == resB) {
+            if (a.getExtension() == b.getExtension()) {
+                return a.getSize() > b.getSize();
+            } else {
+                if (a.getExtension() == "mp4") {
+                    // Prefer mp4 over other, mp4-ist :P
+                    return true;
+                }
+                return false;
+            }
+        } else {
+            return false;
+        }
+    });
+
     int i=0;
-    Q_FOREACH (Meta meta, map.values()) {
+    Q_FOREACH (Meta meta, availaibleFormats) {
         table->setItem(i, 0, new QTableWidgetItem(QString::number(meta.getItag())));
         table->setItem(i, 1, new QTableWidgetItem(meta.getExtension()));
         table->setItem(i, 2, new QTableWidgetItem(meta.getResolution()));
@@ -36,7 +70,20 @@ VideoInfo::VideoInfo(Video video,QWidget *parent) :
     }
     table->selectRow(0);
 
+    QDir downloadDir;
+    QSettings settings("Parallel Tube");
+    qDebug() << settings.fileName();
+    QString dirPath = settings.value("downloadDir").toString();
+    if (dirPath.isEmpty()) {
+        downloadDir = QStandardPaths::writableLocation(QStandardPaths::MoviesLocation);
+    } else {
+        downloadDir = QDir(dirPath);
+    }
+    ui->leDestination->setText(downloadDir.absoluteFilePath(video.getTitle() + "." + ui->tableWidget->item(ui->tableWidget->currentRow(), 1)->text()));
+
     connect(ui->bDownload, SIGNAL(clicked(bool)), this, SLOT(onDownloadClicked(bool)));
+    connect(ui->bBrowse, SIGNAL(clicked(bool)), this, SLOT(onBrowseClicked(bool)));
+    connect(ui->tableWidget, SIGNAL(cellActivated(int,int)), this, SLOT(tableRowChanged(int, int)) );
 
     progress = 0;
 
@@ -47,8 +94,46 @@ VideoInfo::~VideoInfo()
     delete ui;
 }
 
+void VideoInfo::tableRowChanged(int row, int column)
+{
+    Q_UNUSED(row);
+    Q_UNUSED(column);
+    QString oldFileName = ui->leDestination->text().split('/').back(); // TODO : Fix for windows
+    QString newFileName = video.getTitle() + "." + ui->tableWidget->item(ui->tableWidget->currentRow(), 1)->text();
+    QString filePath = ui->leDestination->text().replace(oldFileName, newFileName);
+    ui->leDestination->setText(filePath);
+}
+
+void VideoInfo::onBrowseClicked(bool clicked)
+{
+    Q_UNUSED(clicked);
+    QFileDialog fileDialog;
+    fileDialog.setFileMode(QFileDialog::Directory);
+    fileDialog.setOption(QFileDialog::ShowDirsOnly);
+    int result = fileDialog.exec();
+    if (result) {
+        QDir downloadDir = QDir(fileDialog.selectedFiles()[0]);
+        ui->leDestination->setText(downloadDir.absoluteFilePath(video.getTitle() + "." + ui->tableWidget->item(ui->tableWidget->currentRow(), 1)->text()));
+
+
+        // TODO : Create a settings manager
+        QSettings settings("Parallel Tube");
+        settings.setValue("downloadDir", downloadDir.absolutePath());
+    }
+}
+
 void VideoInfo::onDownloadClicked(bool checked)
 {
+
+    QFile file(ui->leDestination->text());
+    bool isFileWritePossible = file.open(QIODevice::ReadWrite);
+    if (!isFileWritePossible) {
+        QMessageBox msgBox;
+        msgBox.setText("Invalid file path");
+        msgBox.exec();
+        return;
+    }
+
     ui->progressBar->show();
     ui->bDismiss->hide();
     ui->bDownload->hide();
@@ -83,7 +168,9 @@ void VideoInfo::onDownloadClicked(bool checked)
         break;
     }
 
-    DownloadManager *dm = new DownloadManager(meta, video.getTitle() + "." + tableWidget->item(selectedRow, 1)->text(), this);
+
+    //DownloadManager *dm = new DownloadManager(meta, "googleio." + tableWidget->item(selectedRow, 1)->text(), this);
+    DownloadManager *dm = new DownloadManager(meta, ui->bBrowse->text(), this);
     connect(dm, SIGNAL(progress(qint64,qint64)), this, SLOT(downloadProgress(qint64,qint64)) );
     connect(dm, SIGNAL(downloadCompleted()), this, SLOT(finished()) );
     dm->download();

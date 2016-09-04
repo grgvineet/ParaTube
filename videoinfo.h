@@ -26,6 +26,8 @@ private:
     QNetworkAccessManager* mgr;
 
 private slots:
+    void tableRowChanged(int row, int column);
+    void onBrowseClicked(bool clicked);
     void onDownloadClicked(bool checked);
     void finished();
     void downloadProgress(qint64, qint64);

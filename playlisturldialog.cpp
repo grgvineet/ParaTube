@@ -37,8 +37,8 @@ void PlaylistUrlDialog::playlistDataDownloaded(QVector<Video> videos)
     this->close();
 
     Q_FOREACH(Video video, videos) {
-        VideoInfo dialog(video, this);
-        dialog.setModal(true);
-        dialog.exec();
+        VideoInfo *dialog = new VideoInfo(video);
+//        dialog.setModal(true);
+        dialog->show();
     }
 }

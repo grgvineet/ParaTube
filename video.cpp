@@ -6,12 +6,12 @@
 #include <QUrl>
 #include <QMap>
 
-QMap<int, Meta> Video::getAvailaibleFormats() const
+QList<Meta> Video::getAvailaibleFormats() const
 {
     return availaibleFormats;
 }
 
-void Video::setAvailaibleFormats(const QMap<int, Meta> &value)
+void Video::setAvailaibleFormats(const QList<Meta> &value)
 {
     availaibleFormats = value;
 }
@@ -98,7 +98,7 @@ Video::Video(QJsonObject &videoData)
         Q_FOREACH(QString parameter, parameters) {
             QStringList keyValue = parameter.split("=");
             map.insert(keyValue.at(0), QUrl::fromPercentEncoding(keyValue.at(1).toUtf8()));
-//            qDebug() << keyValue.at(0) << " - " << QUrl::fromPercentEncoding(keyValue.at(1).toUtf8());
+            qDebug() << keyValue.at(0) << " - " << QUrl::fromPercentEncoding(keyValue.at(1).toUtf8());
         }
         Meta meta;
         meta.setItag(map["itag"].toInt());
@@ -137,7 +137,8 @@ Video::Video(QJsonObject &videoData)
         meta.setExtension(extension);
         meta.setResolution(resolution);
         meta.findVideoSize();
-        this->availaibleFormats[meta.getItag()] = meta;
+//        this->availaibleFormats[meta.getItag()] = meta;
+        this->availaibleFormats.push_back(meta);
 //        qDebug() << "\n\n";
     }
 

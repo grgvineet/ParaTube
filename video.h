@@ -17,15 +17,15 @@ class Video
     QString url;
     QString length;
 
-    QMap<int, Meta> availaibleFormats;
+    QList<Meta> availaibleFormats;
 public:
     Video();
     Video(QJsonObject& videoData);
 
     void printInfo();
 
-    QMap<int, Meta> getAvailaibleFormats() const;
-    void setAvailaibleFormats(const QMap<int, Meta> &value);
+    QList<Meta> getAvailaibleFormats() const;
+    void setAvailaibleFormats(const QList<Meta> &value);
     QString getVideoId() const;
     void setVideoId(const QString &value);
     QString getTitle() const;
