@@ -144,7 +144,14 @@ void VideoInfo::onDownloadClicked(bool checked)
     QString itagText = itag->text();
 
     // the HTTP request
-    Meta meta = video.getAvailaibleFormats()[itagText.toInt()];
+//    Meta meta = video.getAvailaibleFormats()[itagText.toInt()];
+    Meta meta;
+    Q_FOREACH(Meta m, video.getAvailaibleFormats()) {
+        if (m.getItag() == itagText.toInt()) {
+            meta = m;
+            break;
+        }
+    }
 
     while (true) {
         QUrl url(meta.getUrl());
@@ -170,7 +177,7 @@ void VideoInfo::onDownloadClicked(bool checked)
 
 
     //DownloadManager *dm = new DownloadManager(meta, "googleio." + tableWidget->item(selectedRow, 1)->text(), this);
-    DownloadManager *dm = new DownloadManager(meta, ui->bBrowse->text(), this);
+    DownloadManager *dm = new DownloadManager(meta, ui->leDestination->text(), this);
     connect(dm, SIGNAL(progress(qint64,qint64)), this, SLOT(downloadProgress(qint64,qint64)) );
     connect(dm, SIGNAL(downloadCompleted()), this, SLOT(finished()) );
     dm->download();
